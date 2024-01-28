@@ -1,0 +1,23 @@
+# https://xkcd.com/208/ (h/t etienne)
+prepare-environment:
+  stage: .pre
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-development, rules, changes]
+      variables:
+        ENVIRONMENT: development
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-sandbox, rules, changes]
+      variables:
+        ENVIRONMENT: sandbox
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-production, rules, changes]
+      variables:
+        ENVIRONMENT: production
+  script:
+    - echo "DEVELOPMENT_VERSION=$(grep 'default\s*=' ./deploy/development-version.tf | awk '{print $NF}' | sed 's/\"//g')" >> versions.env
+    - echo "PRODUCTION_VERSION=$(grep 'default\s*=' ./deploy/production-version.tf | awk '{print $NF}' | sed 's/\"//g')" >> versions.env
+    - echo "SANDBOX_VERSION=$(grep 'default\s*=' ./deploy/sandbox-version.tf | awk '{print $NF}' | sed 's/\"//g')" >> versions.env
+  artifacts:
+    reports:
+      dotenv: versions.env

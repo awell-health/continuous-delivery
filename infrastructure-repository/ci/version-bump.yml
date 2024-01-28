@@ -1,0 +1,34 @@
+.trigger-rules:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger" && ($ENVIRONMENT == 'development' || $ENVIRONMENT == 'production' || $ENVIRONMENT == 'sandbox') && $VERSION
+
+version-bump:
+  stage: version-bump
+  extends:
+    - .trigger-rules
+  before_script:
+    - echo -e "\e[95mCurrent $ENVIRONMENT-version.tf:"
+    - echo -e "\e[95m$(cat ./deploy/$ENVIRONMENT-version.tf)"
+  script:
+    - echo "updating version to $VERSION for environment $ENVIRONMENT"
+    - git config --global user.name "CI"
+    - git config --global user.email "ci@awellhealth.com"
+    - git checkout main
+    - export OLD_VERSION=$(grep 'default\s*=' ./deploy/$ENVIRONMENT-version.tf | awk '{print $NF}' | sed 's/\"//g')
+    - echo "bump version from $OLD_VERSION to $VERSION"
+    - sed -i "s/default\s*=\s*.*/default = \"$VERSION\"/" ./deploy/$ENVIRONMENT-version.tf
+    - git add ./deploy/$ENVIRONMENT-version.tf
+    - git commit -m "bump version from $OLD_VERSION to $VERSION"
+    - git push https://oauth2:$JB_INFRA_PAT@gitlab.com/awellhealth/deployment/infrastructure.git
+
+  after_script:
+    - echo -e "\e[95mUpdated $ENVIRONMENT-version.tf:"
+    - echo -e "\e[95m$(cat ./deploy/$ENVIRONMENT-version.tf)"
+
+trigger-pending-release:
+  extends:
+    - .trigger-release-notification
+    - .trigger-rules
+  stage: version-bump
+  variables:
+    JOB_STATUS: pending

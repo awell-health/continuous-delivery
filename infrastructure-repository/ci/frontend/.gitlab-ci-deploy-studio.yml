@@ -1,0 +1,96 @@
+.base-deploy-studio:
+  extends:
+    - .base-deploy
+  script:
+    - sh ./serverless/scripts/create_release.sh pathway_studio
+    - cd packages/app-pathway-studio
+    - echo PATHWAY_STUDIO_CRASH_REPORTER_URL=$PATHWAY_STUDIO_CRASH_REPORTER_URL >> .env
+    - echo AWELL_VERSION=$AWELL_VERSION >> .env
+    - echo URL_CAREOPS=$URL_CAREOPS >> .env
+    - echo URL_CARE=$URL_CARE >> .env
+    - echo URL_HOSTED_PAGES=$URL_HOSTED_PAGES >> .env
+    - echo STATSIG_CLIENT_KEY=$STATSIG_CLIENT_KEY >> .env
+    - yarn run build
+    - firebase use $AWELL_ENVIRONMENT
+    - firebase deploy --only hosting:studio
+    - cd ../../ && sh ./serverless/scripts/complete_release.sh pathway_studio
+
+studio-staging:
+  environment:
+    name: studio-staging
+    url: https://studio.staging.awellhealth.com
+    deployment_tier: staging
+  extends:
+    - .base-deploy-studio
+    - .base-deploy-staging
+  variables:
+    URL_CAREOPS: https://careops.staging.awellhealth.com
+    URL_CARE: https://care.staging.awellhealth.com
+    URL_HOSTED_PAGES: https://goto.staging.awell.health
+  before_script:
+    - cd /app/
+    - cp $STUDIO_ENV_STAGING packages/app-pathway-studio/.env
+
+studio-sandbox:
+  environment:
+    name: studio-sandbox
+    url: https://studio.sandbox.awellhealth.com
+    deployment_tier: staging
+  extends:
+    - .base-deploy-studio
+    - .base-deploy-sandbox
+  variables:
+    URL_CAREOPS: https://careops.sandbox.awellhealth.com
+    URL_CARE: https://care.sandbox.awellhealth.com
+    URL_HOSTED_PAGES: https://goto.sandbox.awell.health
+  before_script:
+    - cd /app/
+    - cp $STUDIO_ENV_SANDBOX packages/app-pathway-studio/.env
+
+studio-production:
+  environment:
+    name: studio-production
+    url: https://studio.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-studio
+    - .base-deploy-production-eu
+  variables:
+    URL_CAREOPS: https://careops.awellhealth.com
+    URL_CARE: https://care.awellhealth.com
+    URL_HOSTED_PAGES: https://goto.awell.health
+  before_script:
+    - cd /app/
+    - cp $STUDIO_ENV_PRODUCTION packages/app-pathway-studio/.env
+
+studio-production-us:
+  environment:
+    name: studio-production-us
+    url: https://studio.us.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-studio
+    - .base-deploy-production-us
+  variables:
+    URL_CAREOPS: https://careops.us.awellhealth.com
+    URL_CARE: https://care.us.awellhealth.com
+    URL_HOSTED_PAGES: https://goto.us.awell.health
+  before_script:
+    - cd /app/
+    - cp $STUDIO_ENV_PRODUCTION_US packages/app-pathway-studio/.env
+
+studio-production-uk:
+  environment:
+    name: studio-production-uk
+    url: https://studio.uk.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-studio
+    - .base-deploy-production-uk
+  variables:
+    URL_CAREOPS: https://careops.uk.awellhealth.com
+    URL_CARE: https://care.uk.awellhealth.com
+    URL_HOSTED_PAGES: https://goto.uk.awell.health
+  before_script:
+    - cd /app/
+    - cp $STUDIO_ENV_PRODUCTION_UK packages/app-pathway-studio/.env

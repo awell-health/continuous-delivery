@@ -1,0 +1,65 @@
+# Base jobs that can be used to deploy front end apps from the appropriate build container.
+.base-deploy:
+  image:
+    name: eu.gcr.io/awell-container-registry/awell-build:$AWELL_VERSION
+    entrypoint: [""]
+  stage: deploy-frontend
+  before_script:
+    - cd /app/
+  variables:
+    GIT_STRATEGY: none
+
+.base-deploy-staging:
+  extends:
+    - .base-deploy
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main"'
+      changes: !reference [.base-rule-changes-development, rules, changes]
+  variables:
+    AWELL_VERSION: $DEVELOPMENT_VERSION
+    AWELL_ENVIRONMENT: staging
+    RELEASE_MANAGEMENT_BASE_URL: https://europe-west1-awellhealth-staging.cloudfunctions.net
+
+.base-deploy-sandbox:
+  extends:
+    - .base-deploy
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main"'
+      changes: !reference [.base-rule-changes-sandbox, rules, changes]
+  variables:
+    AWELL_VERSION: $SANDBOX_VERSION
+    AWELL_ENVIRONMENT: sandbox
+    RELEASE_MANAGEMENT_BASE_URL: https://europe-west1-awell-sandbox.cloudfunctions.net
+
+.base-deploy-production-eu:
+  extends:
+    - .base-deploy
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main"'
+      changes: !reference [.base-rule-changes-production-eu, rules, changes]
+  variables:
+    AWELL_VERSION: $PRODUCTION_VERSION
+    AWELL_ENVIRONMENT: production
+    RELEASE_MANAGEMENT_BASE_URL: https://europe-west1-awell-production.cloudfunctions.net
+
+.base-deploy-production-uk:
+  extends:
+    - .base-deploy
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main"'
+      changes: !reference [.base-rule-changes-production-uk, rules, changes]
+  variables:
+    AWELL_VERSION: $PRODUCTION_VERSION
+    AWELL_ENVIRONMENT: production-uk
+    RELEASE_MANAGEMENT_BASE_URL: https://europe-west1-awell-production.cloudfunctions.net
+
+.base-deploy-production-us:
+  extends:
+    - .base-deploy
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main"'
+      changes: !reference [.base-rule-changes-production-us, rules, changes]
+  variables:
+    AWELL_VERSION: $PRODUCTION_VERSION
+    AWELL_ENVIRONMENT: production-us
+    RELEASE_MANAGEMENT_BASE_URL: https://europe-west1-awell-production.cloudfunctions.net

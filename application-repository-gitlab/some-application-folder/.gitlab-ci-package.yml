@@ -1,0 +1,8 @@
+package-pathway-design:
+  extends: 
+    - .build-docker-image
+    - .base-package
+  variables:
+    AWELL_VERSION: $CI_COMMIT_SHORT_SHA
+    DOCKER_FILE_PATH: "$CI_PROJECT_DIR/some-application-folder/Dockerfile.kaniko"
+    DOCKER_IMAGE_NAME: <YOUR_APPLICATION_NAME>

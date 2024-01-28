@@ -1,0 +1,11 @@
+trigger-development-release:
+  stage: trigger-deploy
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~/^hotfix/)'
+  image:
+    name: node:18-alpine3.18
+    entrypoint: [""]
+  script:
+    - apk update && apk add curl bash --update --quiet --no-cache
+    - cd $CI_PROJECT_DIR
+    - bash ./ci/scripts/platform-trigger-infrastructure-deploy.sh $CI_COMMIT_SHORT_SHA

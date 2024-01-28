@@ -1,0 +1,24 @@
+.gitlab-terraform:
+  image:
+    name: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main"'
+      changes:
+        - .gitlab-ci*.yml
+        - deploy/*
+  before_script:
+    - cd ${TF_ROOT}
+    - terraform init
+  variables:
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/ci-${CI_PROJECT_NAME}
+    TF_ROOT: ${CI_PROJECT_DIR}/deploy
+
+# We cannot pull a plan into a file and apply it given we are using terraform cloud
+# see backend.tf or try to run `terraform plan -out ...` to see the error message.
+tf-plan:
+  extends:
+    - .gitlab-terraform
+  stage: deploy-tf
+  script:
+    - terraform plan
+    - terraform apply -auto-approve

@@ -1,0 +1,13 @@
+image: node:18-buster
+
+stages:
+  - test
+  - package
+  - trigger-deploy
+
+include:
+- local: 'ci/.gitlab-ci-base.yml'
+- local: 'ci/.gitlab-ci-pre.yml'
+- local: 'ci/.gitlab-ci-test.yml'
+- local: 'ci/.gitlab-ci-trigger.yml'
+- local: 'some-application-folder/.gitlab-ci-package.yml'

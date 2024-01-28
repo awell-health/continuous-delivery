@@ -1,0 +1,48 @@
+.base-test-rules:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH'
+
+.base-build:
+  image:
+    name: <YOUR_REGISTRY>/<BUILD_IMAGE_NAME>:$AWELL_VERSION
+    entrypoint: ['']
+  before_script:
+    - cd /app/
+  variables:
+    GIT_STRATEGY: none
+
+.base-test:
+  extends:
+    - .base-build
+    - .base-test-rules
+  stage: test
+  needs: ['package-awell-build']
+  variables:
+    AWELL_VERSION: $CI_COMMIT_SHORT_SHA
+
+.base-package:
+  stage: package
+  needs: ['package-awell-build']
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~/^hotfix/)'
+
+.build-docker-image:
+  variables:
+    KUBERNETES_CPU_REQUEST: '2'
+    KUBERNETES_MEMORY_REQUEST: 4Gi
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.1-debug
+    entrypoint: ['']
+  tags:
+    - docker-builder
+  stage: package
+  script:
+    - export GOOGLE_APPLICATION_CREDENTIALS=/kaniko/kaniko-secret.json
+    - echo $GCLOUD_CI_CR_KEY_BASE64 | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
+    - /kaniko/executor --context $CI_PROJECT_DIR
+      --cache=true
+      --use-new-run
+      --target=prod
+      --dockerfile $DOCKER_FILE_PATH
+      --destination <YOUR_REGISTRY>/$DOCKER_IMAGE_NAME:$AWELL_VERSION
+      --destination <YOUR_REGISTRY>/$DOCKER_IMAGE_NAME:latest

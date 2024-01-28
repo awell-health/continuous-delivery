@@ -1,0 +1,28 @@
+include:
+  - local: "ci/version-bump.yml"
+  - local: "ci/.pre.yml"
+  - local: "ci/deploy-tf.yml"
+  - local: "ci/frontend/*.yml"
+  - local: "ci/e2e.yml"
+  - local: "ci/.post.yml"
+  - local: ci/.changes.yml
+
+image: node:latest
+
+stages:
+  # bumps version and pushed to main
+  - version-bump
+
+  # on push to main
+  - deploy-tf
+  - deploy-frontend
+  - e2e-testing
+
+.trigger-release-notification:
+  image:
+    name: node:18-alpine3.18
+    entrypoint: [""]
+  before_script:
+    - apk update && apk add curl jq git bash --update --quiet --no-cache
+  script:
+    - bash ci/scripts/register-new-release.sh $ENVIRONMENT $VERSION $JOB_STATUS

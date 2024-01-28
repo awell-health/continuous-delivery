@@ -1,0 +1,50 @@
+trigger-release-failure:
+  extends:
+    - .trigger-release-notification
+  stage: .post
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-development, rules, changes]
+      when: on_failure
+      variables:
+        ENVIRONMENT: development
+        VERSION: $DEVELOPMENT_VERSION
+        JOB_STATUS: failed
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-sandbox, rules, changes]
+      when: on_failure
+      variables:
+        ENVIRONMENT: sandbox
+        VERSION: $SANDBOX_VERSION
+        JOB_STATUS: failed
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-production, rules, changes]
+      when: on_failure
+      variables:
+        ENVIRONMENT: production
+        VERSION: $PRODUCTION_VERSION
+        JOB_STATUS: failed
+
+trigger-release-success:
+  extends:
+    - .trigger-release-notification
+  stage: .post
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-development, rules, changes]
+      variables:
+        ENVIRONMENT: development
+        VERSION: $DEVELOPMENT_VERSION
+        JOB_STATUS: success
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-sandbox, rules, changes]
+      variables:
+        ENVIRONMENT: sandbox
+        VERSION: $SANDBOX_VERSION
+        JOB_STATUS: success
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes: !reference [.base-rule-changes-production, rules, changes]
+      variables:
+        ENVIRONMENT: production
+        VERSION: $PRODUCTION_VERSION
+        JOB_STATUS: success

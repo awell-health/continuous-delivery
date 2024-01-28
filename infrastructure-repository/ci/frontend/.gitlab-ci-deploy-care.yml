@@ -1,0 +1,88 @@
+.base-deploy-care:
+  extends:
+    - .base-deploy
+  script:
+    - cd packages/app-care
+    - echo CARE_CRASH_REPORTER_URL=$CARE_CRASH_REPORTER_URL >> .env
+    - echo AWELL_VERSION=$AWELL_VERSION >> .env
+    - echo URL_CAREOPS=$URL_CAREOPS >> .env
+    - echo URL_PATHWAY_STUDIO=$URL_PATHWAY_STUDIO >> .env
+    - echo STATSIG_CLIENT_KEY=$STATSIG_CLIENT_KEY >> .env
+    - yarn run build
+    - firebase use $AWELL_ENVIRONMENT
+    - firebase deploy --only hosting:care
+
+care-staging:
+  environment:
+    name: care-staging
+    url: https://care.staging.awellhealth.com
+    deployment_tier: staging
+  extends:
+    - .base-deploy-care
+    - .base-deploy-staging
+  variables:
+    URL_CAREOPS: https://careops.staging.awellhealth.com
+    URL_PATHWAY_STUDIO: https://studio.staging.awellhealth.com
+  before_script:
+    - cd /app/
+    - cp $CARE_ENV_STAGING packages/app-care/.env
+
+care-sandbox:
+  environment:
+    name: care-sandbox
+    url: https://care.sandbox.awellhealth.com
+    deployment_tier: staging
+  extends:
+    - .base-deploy-care
+    - .base-deploy-sandbox
+  variables:
+    URL_CAREOPS: https://careops.sandbox.awellhealth.com
+    URL_PATHWAY_STUDIO: https://studio.sandbox.awellhealth.com
+  before_script:
+    - cd /app/
+    - cp $CARE_ENV_SANDBOX packages/app-care/.env
+
+care-production:
+  environment:
+    name: care-production
+    url: https://care.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-care
+    - .base-deploy-production-eu
+  variables:
+    URL_CAREOPS: https://careops.awellhealth.com
+    URL_PATHWAY_STUDIO: https://studio.awellhealth.com
+  before_script:
+    - cd /app/
+    - cp $CARE_ENV_PRODUCTION packages/app-care/.env
+
+care-production-us:
+  environment:
+    name: care-production-us
+    url: https://care.us.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-care
+    - .base-deploy-production-us
+  variables:
+    URL_CAREOPS: https://careops.us.awellhealth.com
+    URL_PATHWAY_STUDIO: https://studio.us.awellhealth.com
+  before_script:
+    - cd /app/
+    - cp $CARE_ENV_PRODUCTION_US packages/app-care/.env
+
+care-production-uk:
+  environment:
+    name: care-production-uk
+    url: https://care.uk.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-care
+    - .base-deploy-production-uk
+  variables:
+    URL_CAREOPS: https://careops.uk.awellhealth.com
+    URL_PATHWAY_STUDIO: https://studio.uk.awellhealth.com
+  before_script:
+    - cd /app/
+    - cp $CARE_ENV_PRODUCTION_UK packages/app-care/.env

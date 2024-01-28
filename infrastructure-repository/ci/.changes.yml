@@ -1,0 +1,54 @@
+.base-rule-changes-development:
+  rules:
+    changes:
+      - "**/.gitlab-ci*.yml"
+      - deploy/modules/*
+      - deploy/development-version.tf
+      - deploy/environments/development/*
+      - deploy/environments/staging/*
+      - deploy/development.tf
+      - deploy/staging.tf
+.base-rule-changes-sandbox:
+  rules:
+    changes:
+      - "**/.gitlab-ci*.yml"
+      - deploy/modules/*
+      - deploy/sandbox-version.tf
+      - deploy/environments/sandbox/*
+      - deploy/sandbox.tf
+.base-rule-changes-production:
+  rules:
+    changes:
+      - "**/.gitlab-ci*.yml"
+      - deploy/modules/*
+      - deploy/production-version.tf
+      - deploy/environments/production/*
+      - deploy/environments/production-us/*
+      - deploy/environments/production-uk/*
+      - deploy/production.tf
+      - deploy/production-us.tf
+      - deploy/production-uk.tf
+.base-rule-changes-production-us:
+  rules:
+    changes:
+      - "**/.gitlab-ci*.yml"
+      - deploy/modules/*
+      - deploy/production-us.tf
+      - deploy/environments/production-us/*
+      - deploy/production-version.tf
+.base-rule-changes-production-eu:
+  rules:
+    changes:
+      - "**/.gitlab-ci*.yml"
+      - deploy/modules/*
+      - deploy/production.tf
+      - deploy/environments/production/*
+      - deploy/production-version.tf
+.base-rule-changes-production-uk:
+  rules:
+    changes:
+      - "**/.gitlab-ci*.yml"
+      - deploy/modules/*
+      - deploy/production-uk.tf
+      - deploy/environments/production-uk/*
+      - deploy/production-version.tf

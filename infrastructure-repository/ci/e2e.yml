@@ -1,0 +1,59 @@
+regression-test-staging:
+  stage: e2e-testing
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main" && $ENVIRONMENT == "development"'
+      changes: !reference [.base-rule-changes-development, rules, changes]
+  script:
+    - npx checkly trigger --tags=env:staging --record -r=ci --test-session-name=$DEVELOPMENT_VERSION-staging
+  variables:
+    GIT_STRATEGY: none
+    ENVIRONMENT: development
+    VERSION: $DEVELOPMENT_VERSION
+
+regression-test-sandbox:
+  stage: e2e-testing
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main" && $ENVIRONMENT == "sandbox"'
+      changes: !reference [.base-rule-changes-sandbox, rules, changes]
+  script:
+    - npx checkly trigger --tags=env:sandbox --record -r=ci --test-session-name=$SANDBOX_VERSION-sandbox
+  variables:
+    GIT_STRATEGY: none
+    ENVIRONMENT: sandbox
+    VERSION: $SANDBOX_VERSION
+
+regression-test-production-us:
+  stage: e2e-testing
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main" && $ENVIRONMENT == "production"'
+      changes: !reference [.base-rule-changes-production-us, rules, changes]
+  script:
+    - npx checkly trigger --tags=env:production-us --record -r=ci --test-session-name=$PRODUCTION_VERSION-production-us
+  variables:
+    GIT_STRATEGY: none
+    ENVIRONMENT: production
+    VERSION: $PRODUCTION_VERSION
+
+regression-test-production-eu:
+  stage: e2e-testing
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main" && $ENVIRONMENT == "production"'
+      changes: !reference [.base-rule-changes-production-eu, rules, changes]
+  script:
+    - npx checkly trigger --tags=env:production --record -r=ci --test-session-name=$PRODUCTION_VERSION-production
+  variables:
+    GIT_STRATEGY: none
+    ENVIRONMENT: production
+    VERSION: $PRODUCTION_VERSION
+
+regression-test-production-uk:
+  stage: e2e-testing
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == "main" && $ENVIRONMENT == "production"'
+      changes: !reference [.base-rule-changes-production-uk, rules, changes]
+  script:
+    - npx checkly trigger --tags=env:production --record -r=ci --test-session-name=$PRODUCTION_VERSION-production-uk
+  variables:
+    GIT_STRATEGY: none
+    ENVIRONMENT: production
+    VERSION: $PRODUCTION_VERSION

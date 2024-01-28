@@ -1,0 +1,17 @@
+lint-all:
+  variables:
+    KUBERNETES_CPU_REQUEST: "4"
+    KUBERNETES_MEMORY_REQUEST: 4Gi
+  extends:
+    - .base-test
+  script:
+    - yarn workspaces foreach -p run lint --quiet -c ../../eslint-ci.json
+
+all-compile:
+  variables:
+    KUBERNETES_CPU_REQUEST: "3"
+    KUBERNETES_MEMORY_REQUEST: 4Gi
+  extends:
+    - .base-test
+  script:
+    - yarn workspaces foreach -p run compile

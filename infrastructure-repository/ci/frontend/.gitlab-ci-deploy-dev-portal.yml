@@ -1,0 +1,69 @@
+.base-deploy-dev-portal:
+  extends:
+    - .base-deploy
+  script:
+    - cd packages/app-dev-portal
+    - echo URL_UI_KIT_STORYBOOK=https://awellhealth.gitlab.io/awell-next >> .env
+    - yarn run build
+    - firebase use $AWELL_ENVIRONMENT
+    - firebase deploy --only hosting:dev-portal
+
+dev-portal-staging:
+  environment:
+    name: dev-portal-staging
+    url: https://dev-portal.staging.awellhealth.com
+    deployment_tier: staging
+  extends:
+    - .base-deploy-dev-portal
+    - .base-deploy-staging
+  before_script:
+    - cd /app/
+    - cp $DEV_PORTAL_ENV_STAGING packages/app-dev-portal/.env
+
+dev-portal-sandbox:
+  environment:
+    name: dev-portal-sandbox
+    url: https://dev-portal.sandbox.awellhealth.com
+    deployment_tier: staging
+  extends:
+    - .base-deploy-dev-portal
+    - .base-deploy-sandbox
+  before_script:
+    - cd /app/
+    - cp $DEV_PORTAL_ENV_SANDBOX packages/app-dev-portal/.env
+
+dev-portal-production:
+  environment:
+    name: dev-portal-production
+    url: https://dev-portal.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-dev-portal
+    - .base-deploy-production-eu
+  before_script:
+    - cd /app/
+    - cp $DEV_PORTAL_ENV_PRODUCTION packages/app-dev-portal/.env
+
+dev-portal-production-us:
+  environment:
+    name: dev-portal-production-us
+    url: https://dev-portal.us.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-dev-portal
+    - .base-deploy-production-us
+  before_script:
+    - cd /app/
+    - cp $DEV_PORTAL_ENV_PRODUCTION_US packages/app-dev-portal/.env
+
+dev-portal-production-uk:
+  environment:
+    name: dev-portal-production-uk
+    url: https://dev-portal.uk.awellhealth.com
+    deployment_tier: production
+  extends:
+    - .base-deploy-dev-portal
+    - .base-deploy-production-uk
+  before_script:
+    - cd /app/
+    - cp $DEV_PORTAL_ENV_PRODUCTION_UK packages/app-dev-portal/.env
